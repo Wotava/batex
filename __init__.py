@@ -57,16 +57,49 @@ bpy.types.Scene.one_material_ID = BoolProperty(name="One material ID",
                 default=True,
                 description="Export just one material per object")
 
+bpy.types.Scene.global_scale = FloatProperty(
+        name="Scale",
+        description="Scale all data (Some importers do not support scaled armatures!)",
+        min=0.001, max=1000.0,
+        soft_min=0.01, soft_max=1000.0,
+        default=1.0,
+        )
+bpy.types.Scene.apply_unit_scale = BoolProperty(
+        name="Apply Unit",
+        description="Take into account current Blender units settings (if unset, raw Blender Units values are used as-is)",
+        default=True,
+        )
+bpy.types.Scene.apply_scale_options = EnumProperty(
+        items=(('FBX_SCALE_NONE', "All Local",
+                "Apply custom scaling and units scaling to each object transformation, FBX scale remains at 1.0"),
+               ('FBX_SCALE_UNITS', "FBX Units Scale",
+                "Apply custom scaling to each object transformation, and units scaling to FBX scale"),
+               ('FBX_SCALE_CUSTOM', "FBX Custom Scale",
+                "Apply custom scaling to FBX scale, and units scaling to each object transformation"),
+               ('FBX_SCALE_ALL', "FBX All",
+                "Apply custom scaling and units scaling to FBX scale"),
+               ),
+        name="Apply Scalings",
+        description="How to apply custom and units scalings in generated FBX file "
+                    "(Blender uses FBX scale to detect units on import, "
+                    "but many other applications do not handle the same way)",
+        )
+
+bpy.types.Scene.use_triangles = BoolProperty(
+            name="Triangulate Faces",
+            description="Convert all faces to triangles",
+            default=False,
+            )
 
 bpy.types.Scene.axis_forward = EnumProperty(
     name="Axis Forward",
     items=(
-        ('X', '+X', ''),
-        ('Y', '+Y', ''),
-        ('Z', '+Z', ''),
-        ('-X', '-X', ''),
-        ('-Y', '-Y', ''),
-        ('-Z', '-Z', ''),
+        ('X', '+X Forward', ''),
+        ('Y', '+Y Forward', ''),
+        ('Z', '+Z Forward', ''),
+        ('-X', '-X Forward', ''),
+        ('-Y', '-Y Forward', ''),
+        ('-Z', '-Z Forward', ''),
     ),
     default='-Z'
     )
@@ -74,12 +107,12 @@ bpy.types.Scene.axis_forward = EnumProperty(
 bpy.types.Scene.axis_up = EnumProperty(
     name="Axis Up",
     items=(
-        ('X', '+X', ''),
-        ('Y', '+Y', ''),
-        ('Z', '+Z', ''),
-        ('-X', '-X', ''),
-        ('-Y', '-Y', ''),
-        ('-Z', '-Z', ''),
+        ('X', '+X Up', ''),
+        ('Y', '+Y Up', ''),
+        ('Z', '+Z Up', ''),
+        ('-X', '-X Up', ''),
+        ('-Y', '-Y Up', ''),
+        ('-Z', '-Z Up', ''),
     ),
     default='Y'
     )
