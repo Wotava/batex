@@ -44,6 +44,15 @@ class BATEX_PT_Panel(Panel):
 
         box = layout.box()
         row = box.row()
+        row.prop(context.scene, "remove_postfix")
+        if context.scene.remove_postfix:
+            row = box.row()
+            row.label(text="Object types to rename")
+            row = box.row()
+            row.prop(context.scene, "remove_postfix_types")
+
+        box = layout.box()
+        row = box.row()
         col = row.column(align=True)
         col.label(text="Forward")
         col = row.column(align=True)

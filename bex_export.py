@@ -17,6 +17,8 @@ class BatEx_Export:
     self.__one_material_id = context.scene.one_material_ID
     self.__export_objects = context.selected_objects
     self.__export_animations = context.scene.export_animations
+    self.__remove_postfix = context.scene.remove_postfix
+    self.__remove_postfix_types = context.scene.remove_postfix_types
     self.__mat_faces = {}
     self.__materials = []
   
@@ -84,6 +86,7 @@ class BatEx_Export:
   def do_export(self):
 
     bpy.ops.object.mode_set(mode='OBJECT')
+    global_renames = dict()
 
     for obj in self.__export_objects:
       bpy.ops.object.select_all(action='DESELECT') 
@@ -93,11 +96,62 @@ class BatEx_Export:
       old_pos = self.do_center(obj)
 
       # Select children if exist
+      children = []
       for child in get_children(obj):
         child.select_set(state=True)
+        children.append(child)
 
       # Remove materials except the last one
       materials_removed = self.remove_materials(obj)
+
+      # Remove name postfix
+      if self.__remove_postfix:
+
+        # Rename parent object if needed
+        # Parent names should be preserved and incremented consistently across the entire export process since you
+        # can't export objects with the same names to different files (yet), because exporter will keep overriding one
+        # file with that name, like Cube, Cube.001 and Cube.002 will be written to Cube.fbx over each other
+        # But "local" (child) renames are tracked separately, because their names don't affect export file name
+        local_renames = dict()
+        if len(obj.name) > 3 and obj.name[-4] == '.' and obj.type in self.__remove_postfix_types:
+          if obj.name[0:-4] in global_renames:
+            global_renames[obj.name[0:-4]] += 1
+            target_name = obj.name[0:-4] + "." + str(1000 + global_renames[obj.name[0:-4]])[-3:]
+          else:
+            target_name = obj.name[0:-4]
+            global_renames[target_name] = 0
+          swap_names(self.__context, target_name, obj)
+        elif obj.type in self.__remove_postfix_types:
+          global_renames[obj.name] = 0
+
+        # rename child objects
+        for selection in children:
+          if selection.name[-4] != '.':
+            local_renames[selection.name] = 0
+          if selection.name[-4] != '.' or selection.type not in self.__remove_postfix_types:
+            continue
+
+          # if this name was not affected during this export yet,
+          # check if it's related to parent object and rename accordingly
+          target_name = selection.name[0:-4]
+          if target_name not in local_renames and target_name not in global_renames:
+            if selection.parent.name == target_name:
+              local_renames[target_name] = 1
+              target_name = selection.name[0:-4] + ".001"
+            else:
+              local_renames[target_name] = 0
+            swap_names(self.__context, target_name, selection)
+            continue
+
+          # process already used names
+          if selection.name[0:-4] in local_renames:
+            local_renames[selection.name[0:-4]] += 1
+            target_name = selection.name[0:-4] + "." + str(1000 + local_renames[selection.name[0:-4]])[-3:]
+          elif selection.name[0:-4] in global_renames:
+            local_renames[selection.name[0:-4]] = global_renames[selection.name[0:-4]] + 1
+            target_name = selection.name[0:-4] + "." + str(1000 + local_renames[selection.name[0:-4]])[-3:]
+          swap_names(self.__context, target_name, selection)
+          print(selection.name)
 
       ex_object_types = self.__context.scene.object_types
 

@@ -96,6 +96,29 @@ bpy.types.Scene.object_types = EnumProperty(
     default={'MESH'},
 )
 
+bpy.types.Scene.remove_postfix = BoolProperty(name="Remove postfixes",
+                default=True,
+                description="Attempts to remove .XXX (ex: name.012) postfix from object names of specified types."
+                            "[Parents]: If same names present in multiple objects, sorts their postfixes."
+                            "[Childs]: Objects will be renamed with incremented postfix from parent if they "
+                            "have the same name, otherwise child names will be sorted per parent,"
+                            "[!WARNING!]May produce unexpected results if you have lots of naming repetition between "
+                            "parent and child objects with different types. It's intended to rename SOCKET_ empties"
+                            "for use with Unreal Engine")
+
+bpy.types.Scene.remove_postfix_types = EnumProperty(
+    name="Object Types",
+    options={'ENUM_FLAG'},
+    items=(('EMPTY', "Empty", ""),
+           ('CAMERA', "Camera", ""),
+           ('LIGHT', "Lamp", ""),
+           ('MESH', "Mesh", ""),
+           ('OTHER', "Other", "Other geometry types, like curve, metaball, etc. (converted to meshes)"),
+           ),
+    description="Which kind of object to rename",
+    default={'MESH', 'EMPTY'},
+)
+
 classes = ( BATEX_PT_Panel, BATEX_OT_Operator, BATEX_OT_OpenFolder )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
