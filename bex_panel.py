@@ -44,14 +44,14 @@ class BATEX_PT_Panel(Panel):
 
         box = layout.box()
         row = box.row()
+        row.label(text="Transforms", icon="OBJECT_ORIGIN")
+
+        row = box.row()
         col = row.column(align=True)
         col.label(text="Forward")
         col = row.column(align=True)
         col.scale_x = 1.25
         col.prop(context.scene, "axis_forward", text="")
-
-        col = layout.column(align=True)
-        col.prop(context.scene, "object_types")
 
         row = box.row()
         col = row.column(align=True)
@@ -60,11 +60,32 @@ class BATEX_PT_Panel(Panel):
         col.scale_x = 1.25
         col.prop(context.scene, "axis_up", text="")
 
+        row = box.row()
+        col = row.column(align=True)
+        col.label(text="Scale")
+        col = row.column(align=True)
+        col.scale_x = 1.25
+        col.prop(context.scene, "global_scale", text="")
+
+        row = box.row()
+        col = row.column(align=True)
+        col.label(text="Scaling")
+        col = row.column(align=True)
+        col.scale_x = 1.25
+        col.prop(context.scene, "apply_scale_options", text="")
+
+        row = box.row()
+        row.prop(context.scene, "use_triangles")
+
+        row = box.row()
+        row.prop(context.scene, "apply_unit_scale")
+
+        col = layout.column(align=True)
+        col.prop(context.scene, "object_types")
+
         if context.scene.axis_forward == context.scene.axis_up:
             row = box.row()
             row.label(icon="ERROR", text="Forward and Up are equal")
 
         row = layout.row()
         row.operator('object.bex_ot_operator', text='Export')
-
-
