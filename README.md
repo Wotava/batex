@@ -5,7 +5,7 @@ without all the unnecessary setup complexity other addons have.
 This is a fork of jayanam's [batex addon](https://github.com/jayanam/batex) with some 
 additional features that can be useful for Unreal Engine development. It will be actively maintained and improved, so 
 any feedback is appreciated. Check [dev branch](https://github.com/Wotava/batex/tree/dev) for some unstable 
-features in development (then can be **really** unstable and produce unexpected results, so proceed with caution).
+features in development (they can be **really** unstable and produce unexpected results, so proceed with caution).
 
 ### Features
 * One fbx file per selected object
