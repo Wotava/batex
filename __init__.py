@@ -10,13 +10,20 @@ bl_info = {
     "tracker_url": "https://github.com/Wotava/batex/issues",
     "category" : "Import-Export"
 }
+if "bpy" in locals():
+    import importlib
+    importlib.reload(bex_panel)
+    importlib.reload(bex_op)
+    importlib.reload(bex_folder_op)
+    print("[BATEX] Addon reload")
+else:
+    import bpy
+    from bpy.props import *
+    from . import bex_panel
+    from . import bex_op
+    from . import bex_folder_op
+    print("[BATEX] Addon load")
 
-import bpy
-from bpy.props import *
-
-from . bex_panel import *
-from . bex_op import *
-from . bex_folder_op import *
 
 bpy.types.Scene.export_folder = StringProperty(name="Export folder",
                subtype="DIR_PATH", 
@@ -154,7 +161,7 @@ bpy.types.Scene.remove_postfix_types = EnumProperty(
     default={'MESH', 'EMPTY'},
 )
 
-classes = ( BATEX_PT_Panel, BATEX_OT_Operator, BATEX_OT_OpenFolder )
+classes = (bex_panel.BATEX_PT_Panel, bex_op.BATEX_OT_Operator, bex_folder_op.BATEX_OT_OpenFolder )
 
 register, unregister = bpy.utils.register_classes_factory(classes)
     

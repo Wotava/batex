@@ -1,9 +1,14 @@
 import bpy
 
-from bpy.types import Operator
+if "Operator" in locals():
+    import importlib
+    importlib.reload(bex_export)
+    print("[BATEX] OP reload")
+else:
+    from bpy.types import Operator
+    from . import bex_export
+    print("[BATEX] OP load")
 
-from . bex_export import BatEx_Export
-	
 class BATEX_OT_Operator(Operator):
     bl_idname = "object.bex_ot_operator"
     bl_label = "Batch Export"
@@ -16,7 +21,7 @@ class BATEX_OT_Operator(Operator):
 
     def execute(self, context):
 
-        bat_export = BatEx_Export(context)
+        bat_export = bex_export.BatEx_Export(context)
         bat_export.do_export()
         
         self.report({'INFO'}, "Exported to " + context.scene.export_folder)
