@@ -8,7 +8,7 @@ class BATEX_OT_Operator(Operator):
     bl_idname = "object.bex_ot_operator"
     bl_label = "Batch Export"
     bl_description = "Export selected objects as fbx" 
-    bl_options = {'REGISTER'}
+    bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     def poll(cls, context):
