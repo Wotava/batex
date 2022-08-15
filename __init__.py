@@ -139,7 +139,7 @@ bpy.types.Scene.object_types = EnumProperty(
 )
 
 bpy.types.Scene.remove_postfix = BoolProperty(name="Remove postfixes",
-                default=True,
+                default=False,
                 description="Attempts to remove .XXX (ex: name.012) postfix from object names of specified types."
                             "[Parents]: If same names present in multiple objects, sorts their postfixes."
                             "[Childs]: Objects will be renamed with incremented postfix from parent if they "
@@ -160,6 +160,23 @@ bpy.types.Scene.remove_postfix_types = EnumProperty(
     description="Which kind of object to rename",
     default={'MESH', 'EMPTY'},
 )
+bpy.types.Scene.rotate_by_pattern = BoolProperty(name="Rotate Objects",
+                default=False,
+                description="Rotate objects matching name pattern by specified rule before exporting them. Rotation"
+                            "is then restored back to original. This operation is applied AFTER postfix removal (if"
+                            "its enabled")
+
+bpy.types.Scene.rotation_name_pattern = StringProperty(name="Object Name Pattern",
+                default="*",
+                description="Pattern to match when selecting objects for rotation, you can specify multiple"
+                            "name patterns separated by space, like [*_Start *_End] (no brackets needed)")
+
+bpy.types.Scene.rotation_rule = StringProperty(name="Rotation Rule",
+                default="GLOBAL X 0",
+                description="Rotate objects matching name pattern by this rule. Two modes are currently supported:"
+                            "LOCAL and GLOBAL rotation. Example: To rotate object 90 degrees around global Z axis, "
+                            "specify GLOBAL Z 90 in this field. Multiple rules can be specified, every rule should " 
+                            "match this pattern MODE AXIS ANGLE")
 
 classes = (bex_panel.BATEX_PT_Panel, bex_op.BATEX_OT_Operator, bex_folder_op.BATEX_OT_OpenFolder )
 

@@ -44,6 +44,15 @@ class BATEX_PT_Panel(Panel):
 
         box = layout.box()
         row = box.row()
+        row.prop(context.scene, "rotate_by_pattern")
+        if context.scene.rotate_by_pattern:
+            row = box.row()
+            row.prop(context.scene, "rotation_name_pattern", text="Name")
+            row = box.row()
+            row.prop(context.scene, "rotation_rule", text="Rule")
+
+        box = layout.box()
+        row = box.row()
         row.prop(context.scene, "remove_postfix")
         if context.scene.remove_postfix:
             row = box.row()

@@ -1,6 +1,8 @@
 import bpy
 import bmesh
 import os
+import fnmatch
+import math
 from . bex_utils import *
 
 class BatEx_Export:
@@ -19,6 +21,9 @@ class BatEx_Export:
     self.__export_animations = context.scene.export_animations
     self.__remove_postfix = context.scene.remove_postfix
     self.__remove_postfix_types = context.scene.remove_postfix_types
+    self.__rotate_by_pattern = context.scene.rotate_by_pattern
+    self.__rotation_name_pattern = context.scene.rotation_name_pattern
+    self.__rotation_rule = context.scene.rotation_rule.split()
     self.__mat_faces = {}
     self.__materials = []
   
@@ -82,6 +87,41 @@ class BatEx_Export:
     bmesh.update_edit_mesh(obj.data)
 
     bpy.ops.object.mode_set(mode='OBJECT')
+
+  def unpack_rotation(self):
+    i = 0
+    unpack_set = []
+    while i < len(self.__rotation_rule):
+      unpack_item = []
+      if self.__rotation_rule[i] == "GLOBAL" or self.__rotation_rule[i] == "LOCAL":
+        unpack_item.append(self.__rotation_rule[i])
+      if self.__rotation_rule[i + 1].upper() in ["X", "Y", "Z"]:
+        unpack_item.append(self.__rotation_rule[i + 1])
+      if self.__rotation_rule[i + 2].replace('-','',1).replace('+','',1).replace('.','',1).isnumeric():
+        unpack_item.append(float(self.__rotation_rule[i + 2]))
+      if len(unpack_item) == 3:
+        unpack_set.append(unpack_item)
+      i += 1
+      while i < len(self.__rotation_rule) and self.__rotation_rule[i] not in ["GLOBAL", "LOCAL"]:
+        i += 1
+    return unpack_set
+
+  def rotate_object(self, obj, restore):
+    if fnmatch.fnmatch(obj.name, self.__rotation_name_pattern):
+      rules = self.unpack_rotation()
+    else:
+      return False
+
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(state=True)
+    if not restore:
+      for rule in rules:
+        bpy.ops.transform.rotate(orient_type=rule[0], orient_axis=rule[1], value=math.radians(rule[2]))
+    else:
+      for rule in reversed(rules):
+        bpy.ops.transform.rotate(orient_type=rule[0], orient_axis=rule[1], value=math.radians(rule[2] * -1))
+    return True
+
 
   def do_export(self):
 
@@ -153,6 +193,15 @@ class BatEx_Export:
           swap_names(self.__context, target_name, selection)
           print(selection.name)
 
+      # Rotate objects
+      if self.__rotate_by_pattern:
+        targets = [obj]
+        targets.extend(children)
+        for target in targets:
+          self.rotate_object(target, False)
+        for target in targets:
+          target.select_set(state=True)
+
       ex_object_types = self.__context.scene.object_types
 
       if(self.__export_animations):
@@ -187,6 +236,10 @@ class BatEx_Export:
       global_scale=self.__context.scene.global_scale,
       use_triangles=self.__context.scene.use_triangles
       )
+
+      if self.__rotate_by_pattern:
+        for target in targets:
+          self.rotate_object(target, True)
 
       if materials_removed:
         self.restore_materials(obj)
