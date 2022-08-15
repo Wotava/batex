@@ -127,7 +127,12 @@ class BatEx_Export:
       add_leaf_bones=False,
       path_mode='ABSOLUTE',
       axis_forward=self.__context.scene.axis_forward,
-      axis_up=self.__context.scene.axis_up)
+      axis_up=self.__context.scene.axis_up,
+      apply_unit_scale=self.__context.scene.apply_unit_scale,
+      apply_scale_options=self.__context.scene.apply_scale_options,
+      global_scale=self.__context.scene.global_scale,
+      use_triangles=self.__context.scene.use_triangles
+      )
 
       if materials_removed:
         self.restore_materials(obj)
